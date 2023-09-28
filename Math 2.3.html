@@ -74,6 +74,14 @@
             margin-right: auto; /* Center the element by pushing it to the left */
         }
 
+        #got-it-button {
+            font-size: 18px;
+            padding: 10px;
+            width: 50%; /* Adjust the width as needed, e.g., 80% of the container width */
+            margin-left: auto; /* Center the element by pushing it to the right */
+            margin-right: auto; /* Center the element by pushing it to the left */
+        }
+
         #video-options {
           display: flex;
           justify-content: space-around;
@@ -109,18 +117,19 @@
             <div id="problem-container">
                 <label id="problem-label"></label>
                 <div id="problem-display"></div>
-                <input type="text" id="answer-input" placeholder="Enter answer" autofocus onkeyup="handleKeyPress(event)">
+                <input type="number" id="answer-input" placeholder="Enter answer" autofocus onkeyup="handleKeyPress(event)">
                 <button id="submit-button" onclick="checkAnswer()">Submit</button>
                 <div id="correct-answer" style="display: none;"></div>
+                <button id="got-it-button" onclick="updateProblemAfterMistake(probability1)" style="display: none;">Got It</button>
             </div>
         </div>
     </div>
         <div class="lower">
             <div class="video-container"></div>
             <div id="video-options" style="display: none;">
-              <img src="/media/carnaval.jpg" alt="Video 1 Thumbnail" class="thumbnail" width="320" height="180" onclick="chooseVideo(videoId1)">
-              <img src="/media/unicorn.jpg" alt="Video 2 Thumbnail" class="thumbnail" width="320" height="180" onclick="chooseVideo(videoId2)">
-              <img src="/media/resisim.jpg" alt="Video 3 Thumbnail" class="thumbnail" width="320" height="180" onclick="chooseVideo(videoId3)">
+              <img src="https://i.ytimg.com/vi/oN8skMie2k8/mqdefault.jpg" alt="Video 1 Thumbnail" class="thumbnail" width="320" height="180" onclick="chooseVideo(videoId1)">
+              <img src="https://i.ytimg.com/vi/FjEe0U3kQH4/maxresdefault.jpg" class="thumbnail" width="320" height="180" onclick="chooseVideo(videoId2)">
+              <img src="https://i.ytimg.com/vi/fwY4EJRM7ak/maxresdefault.jpg" class="thumbnail" width="320" height="180" onclick="chooseVideo(videoId3)">
             </div>
         </div>
     </div>
@@ -134,8 +143,9 @@
         let answerInput = document.getElementById('answer-input');
         let answer;
         let VideoId;
+        let gotItPromise = null;
 
-        const NUM_STEPS = 10;  // Adjust as needed
+        const NUM_STEPS = 3;  // Adjust as needed
         let currentLevel = NUM_STEPS - 1;
         let probability1 = 0; // Replace with the actual probability
 
@@ -159,11 +169,18 @@
 
         const correctSounds = [
             'https://soundboardguy.com/wp-content/uploads/2021/10/clap.mp3',
+            'https://soundboardguy.com/wp-content/uploads/2022/03/applause-1-mp3cut.mp3',
+            'https://soundboardguy.com/wp-content/uploads/2022/03/crowd-applause.mp3',
+            'https://soundboardguy.com/wp-content/uploads/2022/03/applause-1-mp3cut.mp3',
+            'https://soundboardguy.com/wp-content/uploads/2021/07/vv-applause-football.mp3',
             // Add more correct sound URLs as needed
         ];
 
         const incorrectSounds = [
             'https://us-tuna-sounds-files.voicemod.net/39850ac2-13db-4d70-a2a7-15373c9110ce-1653856084837.mp3',
+            'https://us-tuna-sounds-files.voicemod.net/c07b417a-be6b-43ca-ad5f-1eab0496dc5b-1691582530984.mp3',
+            'https://us-tuna-sounds-files.voicemod.net/55ecda2b-5754-4e58-81e5-e3470b3b2a00-1678130080051.mp3',
+            'https://us-tuna-sounds-files.voicemod.net/bfaaeea1-93d2-462f-be11-4316b475fbaf.mp3'
             // Add more incorrect sound URLs as needed
         ];
 
@@ -246,6 +263,23 @@
             }
         }
 
+        function updateProblemAfterMistake() {
+            const correctAnswerDiv = document.getElementById('correct-answer');
+            correctAnswerDiv.style.display = 'none';  // hide the correct answer
+            const submitButton = document.getElementById('submit-button');
+            submitButton.style.display = 'block';
+            const gotItButton = document.getElementById('got-it-button');
+            gotItButton.style.display = 'none';
+            document.getElementById('answer-input').value = '';
+
+             if (Math.random() < probability1) {
+                createMissingNumberProblem();
+            } else {
+                createAdditionOrSubtractionProblem();
+            }
+        }
+
+
         function updateLadder() {
             const canvas = document.getElementById('canvas');
             const ctx = canvas.getContext('2d');
@@ -278,6 +312,11 @@
 
             if (parseInt(userAnswer) === answer) {
                 currentLevel--; // Update the current level as needed
+                updateLadder(currentLevel)
+
+                // Create a new problem
+                createProblem(probability1);
+                document.getElementById('answer-input').value = '';  // Clear the answer input
 
                 // Show correct animation or message
                 showCorrectGif();
@@ -285,82 +324,25 @@
                 if (currentLevel < 0) {
                     // Display the video options
                     document.getElementById('video-options').style.display = 'block';
-
                 }
+
             } else {
                 if (currentLevel < NUM_STEPS - 1) {
-                    currentLevel++; // Update the current level as needed
+                    currentLevel++;
+                    updateLadder(currentLevel)
                 }
-
-                // Display correct answer
-                const correctAnswerDiv = document.getElementById('correct-answer');
-                correctAnswerDiv.innerText = 'The correct answer is: ' + answer;
-                correctAnswerDiv.style.display = 'block';  // Show the correct answer
-
-                // Move the ladder down
-                moveDown();
-
                 // Show incorrect animation or message
                 showIncorrectGif();
 
                 // Display correct answer
-                console.log('answer is:' + answer);
+                const correctAnswerDiv = document.getElementById('correct-answer');
+                correctAnswerDiv.innerHTML = '<strong>The correct answer is: ' + answer + '</strong>';
+                correctAnswerDiv.style.display = 'block';  // Show the correct answer
+                const submitButton = document.getElementById('submit-button');
+                submitButton.style.display = 'none';
+                const gotItButton = document.getElementById('got-it-button');
+                gotItButton.style.display = 'block';
 
-            }
-
-            // Update the ladder display
-            updateLadder(currentLevel);
-
-            // Create a new problem
-            createProblem(probability1);
-            document.getElementById('answer-input').value = '';  // Clear the answer input
-        }
-
-        function moveUp() {
-            const canvas = document.getElementById('canvas');
-            const ctx = canvas.getContext('2d');
-            const stepSize = canvas.height / NUM_STEPS;
-
-            if (currentLevel < NUM_STEPS - 1) {
-                currentLevel++; // Update the current level as needed
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                for (let i = 0; i < NUM_STEPS; i++) {
-                    let color;
-                    if (i > currentLevel) {
-                        color = 'gray';
-                    } else if (i === currentLevel) {
-                        color = 'blue';
-                    } else {
-                        color = 'green';
-                    }
-                    ctx.fillStyle = color;
-                    ctx.fillRect(0, i * stepSize, canvas.width, (i + 1) * stepSize);
-                }
-            }
-        }
-
-        function moveDown() {
-            const canvas = document.getElementById('canvas');
-            const ctx = canvas.getContext('2d');
-            const stepSize = canvas.height / NUM_STEPS;
-
-            if (currentLevel > 0) {
-                currentLevel--; // Update the current level as needed
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                for (let i = 0; i < NUM_STEPS; i++) {
-                    let color;
-                    if (i > currentLevel) {
-                        color = 'gray';
-                    } else if (i === currentLevel) {
-                        color = 'blue';
-                    } else {
-                        color = 'green';
-                    }
-                    ctx.fillStyle = color;
-                    ctx.fillRect(0, i * stepSize, canvas.width, (i + 1) * stepSize);
-                }
             }
         }
 
@@ -393,48 +375,56 @@
         }
 
         function showIncorrectGif() {
-            const lowerSection = document.querySelector('.lower');
+            // Play a random incorrect sound
+            playRandomSound(incorrectSounds);
+
+            // place the gif on top of the screen
+            const body = document.body;
+            const incorrectGif = document.createElement('img');
 
             // Choose a random incorrect GIF from the array
-            const randomIncorrectGifUrl = incorrect_gifs[Math.floor(Math.random() * incorrect_gifs.length)];
+            const randomGifUrl = incorrect_gifs[Math.floor(Math.random() * incorrect_gifs.length)];
 
-            const incorrectGif = document.createElement('img');
-            incorrectGif.src = randomIncorrectGifUrl;
+            incorrectGif.src = randomGifUrl;
             incorrectGif.classList.add('incorrect-gif');
 
-            // Append the GIF to the lower section
-            lowerSection.appendChild(incorrectGif);
+            // Append the GIF to the body
+            body.appendChild(incorrectGif);
 
             // Center the GIF in the lower section
-            incorrectGif.style.display = 'block';
-            incorrectGif.style.margin = 'auto';
+            incorrectGif.style.position = 'fixed';
+            incorrectGif.style.top = '0';
+            incorrectGif.style.left = '50%';
+            incorrectGif.style.transform = 'translateX(-50%)';
 
             // Set a timeout to hide the GIF after 3 seconds
             setTimeout(() => {
                 incorrectGif.style.display = 'none';
             }, 3000);
-            // Play a random incorrect sound
-            playRandomSound(incorrectSounds);
+
         }
 
         function showCorrectGif() {
-            // Play a random correct sound
+           // Play a random correct sound
             playRandomSound(correctSounds);
             if (currentLevel >= 0) {
-                const lowerSection = document.querySelector('.lower');
+                const body = document.body;
+                const correctGif = document.createElement('img');
 
                 // Choose a random GIF from the array
                 const randomGifUrl = correct_gifs[Math.floor(Math.random() * correct_gifs.length)];
-                const correctGif = document.createElement('img');
+
                 correctGif.src = randomGifUrl;
                 correctGif.classList.add('correct-gif');
 
-                // Append the GIF to the lower section
-                lowerSection.appendChild(correctGif);
+                // Append the GIF to the body
+                body.appendChild(correctGif);
 
                 // Center the GIF in the lower section
-                correctGif.style.display = 'block';
-                correctGif.style.margin = 'auto';
+                correctGif.style.position = 'fixed';
+                correctGif.style.top = '0';
+                correctGif.style.left = '50%';
+                correctGif.style.transform = 'translateX(-50%)';
 
                 // Set a timeout to hide the GIF after 3 seconds
                 setTimeout(() => {
