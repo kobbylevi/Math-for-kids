@@ -186,8 +186,6 @@ body {
 
 <body>
 
-<script src="https://www.youtube.com/iframe_api"></script>
-
     <script>
         const videoId1 = 'https://www.youtube.com/embed/oN8skMie2k8?si=ZGkVhqyhZoAl8fjI';
         const videoId2 = 'https://www.youtube.com/embed/r4wbdKmM3bQ?si=rh4MCdGk0hQkN6LH';
@@ -259,7 +257,6 @@ body {
     let VideoId;
     let gotItPromise = null;
     let problemCreationTime;
-    let player;
     let accumulatedLogData = 'MathProblem,Input Answer,Correct Answer,Is correct marker,Reply Time in seconds\n';  // Variable to accumulate log data before saving it to the computer or server
 
     let NUM_STEPS = 10;  // Adjust as needed
@@ -601,39 +598,20 @@ body {
         audio.play();
     }
 
+
+
+
     function chooseVideo(videoId) {
-      const videoContainer = document.getElementById('video-options');
-      videoContainer.innerHTML = `
-        <div id="youtube-player"></div>
-      `;
 
-      // Ensure that the YouTube API is loaded and the onYouTubeIframeAPIReady function is called
-      if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
-        console.error('YouTube API not loaded.');
-        return;
-      }
-
-      // Create and configure the player
-      const player = new YT.Player('youtube-player', {
-        height: '315',
-        width: '560',
-        videoId: videoId,
-        events: {
-          'onReady': onPlayerReady
-        }
-      });
-
-      function onPlayerReady(event) {
-        // The player is ready to play
-        console.log('YouTube player ready!');
-        player.playVideo();  // Play the video
-      }
+        const videoContainer = document.getElementById('video-options');
+        videoContainer.innerHTML = `
+        <iframe width="560" height="315" src="${videoId}" frameborder="0" allowfullscreen></iframe>
+        `;
     }
 
-    function closeVideo() {
-      const videoContainer = document.getElementById('video-options');
-      videoContainer.innerHTML = ''; // Clear the video container to close the video
-    }
+
+
+
 
 // this will create the log:
 
@@ -685,12 +663,14 @@ body {
     }
     
 // To DO:
+// create a landing page where you can select the type of problems you want to solve
+// add num1 > < = num 2
 //collect user static data such as IP address and email (in function logGeneralDetails() {)
 //Needs to be update for saving the log. I will save it in my computer first, and than allow a save to the google cloud, I have converesed with GPT on it on Oct 3. (637)
 
 
 </script>
+
 </body>
 </html>
-
 
