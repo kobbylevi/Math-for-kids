@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <title>Math Game</title>
+    <style>
+
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+}
+
+.upper {
+    display: flex;
+    flex-direction: row;
+}
+
+.upper-left {
+    flex: 1;
+    padding: 10px;
+    align-items: center;
+    text-align: center;
+}
+
+.upper-right {
+    flex: 1;
+    padding: 10px;
+    align-items: center;
+    text-align: center;
+}
+
+.lower {
+    flex: 1;
+    padding: 10px;
+    align-items: center;
+    text-align: center;
+    height: 100%
+}
+
+#canvas-container {
+    margin-right: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#problem-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+#problem-label {
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+#answer-input {
+    font-size: 18px;
+    padding: 5px;
+    margin-bottom: 10px;
+    width: 50%; /* Adjust the width as needed, e.g., 80% of the container width */
+    margin-left: auto; /* Center the element by pushing it to the right */
+    margin-right: auto; /* Center the element by pushing it to the left */
+}
+
+#submit-button {
+    font-size: 18px;
+    padding: 10px;
+    width: 50%; /* Adjust the width as needed, e.g., 80% of the container width */
+    margin-left: auto; /* Center the element by pushing it to the right */
+    margin-right: auto; /* Center the element by pushing it to the left */
+}
+
+#download-button {
+    font-size: 18px;
+    padding: 10px;
+    width: 50%; /* Adjust the width as needed, e.g., 80% of the container width */
+    margin-left: auto; /* Center the element by pushing it to the right */
+    margin-right: auto; /* Center the element by pushing it to the left */
+}
+
+#got-it-button {
+    font-size: 18px;
+    padding: 10px;
+    width: 50%; /* Adjust the width as needed, e.g., 80% of the container width */
+    margin-left: auto; /* Center the element by pushing it to the right */
+    margin-right: auto; /* Center the element by pushing it to the left */
+}
+#thank-you {
+    font-size: 40px;
+    padding: 10px;
+    width: 50%; /* Adjust the width as needed, e.g., 80% of the container width */
+    margin-left: auto; /* Center the element by pushing it to the right */
+    margin-right: auto;
+}
+
+#play-again-button{
+    font-size: 18px;
+    padding: 10px;
+    width: 50%; /* Adjust the width as needed, e.g., 80% of the container width */
+    margin-left: auto; /* Center the element by pushing it to the right */
+    margin-right: auto; /* Center the element by pushing it to the left */
+}
+
+#video-options {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+/* Add pointer cursor on hover for the thumbnails */
+.thumbnail {
+  cursor: pointer;
+}
+
+/* Add pointer cursor on hover for the Submit button */
+#submit-button {
+    cursor: pointer;
+}
+
+.navbar {
+    background-color: #333;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+.burger-icon {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.burger-icon .bar {
+    height: 3px;
+    width: 25px;
+    background-color: white;
+    margin: 3px 0;
+}
+
+.menu {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu a {
+    color: white;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.menu a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.num-steps-input {
+  width: 40px; /* Adjust the width as needed */
+  height: 30px; /* Adjust the height as needed */
+}
+
+@media (max-width: 768px) {
+    .burger-icon {
+     display: flex;
+}
+
+.menu {
+     display: none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+    <script>
+        const videoId1 = 'https://www.youtube.com/embed/oN8skMie2k8?si=ZGkVhqyhZoAl8fjI';
+        const videoId2 = 'https://www.youtube.com/embed/r4wbdKmM3bQ?si=rh4MCdGk0hQkN6LH';
+        const videoId3 = 'https://www.youtube.com/embed/fwY4EJRM7ak?si=kRrPoQmXVJEoLpof';
+    </script>
+
+        <div class="navbar">
+        <div class="burger-icon" onclick="toggleMenu()">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+        <div class="menu" id="menu">
+            <a href="#">Home</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+            <label for="enableFeature">Enable equation with variables</label>
+           <input type="checkbox" id="enableFeature" checked>
+           <br>
+            <br>
+           <label for="numSteps">Number of Steps:</label>
+           <input type="number" id="numSteps" value="10" class="num-steps-input", min="1", onchange="updateNumSteps()">
+        </div>
+    </div>
+
+    <div class="upper">
+        <div class="upper-left">
+                <div id="canvas-container">
+                    <canvas id="canvas" width="100" height="500"></canvas>
+                </div>
+        </div>
+        <div class="upper-right">
+            <div id="problem-container">
+                <label id="problem-label"></label>
+                <div id="problem-display"></div>
+                <input type="number" id="answer-input" placeholder="Enter answer" autofocus onkeyup="handleKeyPress(event)">
+                <!-- Button for submitting the answer -->
+                <button id="submit-button" onclick="checkAnswer()">Submit</button>
+                <!-- Button for playing again -->
+                <button id="play-again-button" onclick="playAgain()" style="display: none;">Press here to play again</button>
+                <div id="correct-answer" style="display: none;"></div>
+                <button id="got-it-button" onclick="updateProblemAfterMistake(probability1)" style="display: none;">Got It</button>
+                <div id="thank-you" style="display: none;" >Thanks for playing</div>
+                <!-- Button for downloading log data -->
+                <button id="download-button" onclick="downloadCSV()" style="display: none;">Press here to download your results summary</button>
+            </div>
+        </div>
+    </div>
+        <div class="lower">
+            <div class="video-container"></div>
+            <div id="video-options" style="display: none;">
+              <img src="https://i.ytimg.com/vi/oN8skMie2k8/mqdefault.jpg" alt="Carnaval" class="thumbnail" width="320" height="180" onclick="chooseVideo(videoId1)">
+              <img src="https://i.ytimg.com/vi/FjEe0U3kQH4/maxresdefault.jpg" alt="Unicorn" class="thumbnail" width="320" height="180" onclick="chooseVideo(videoId2)">
+              <img src="https://i.ytimg.com/vi/fwY4EJRM7ak/maxresdefault.jpg" alt="resisim" class="thumbnail" width="320" height="180" onclick="chooseVideo(videoId3)">
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    let canvas = document.getElementById('canvas');
+    let ctx = canvas.getContext('2d');
+    let problemLabel = document.getElementById('problem-label');
+    let answerInput = document.getElementById('answer-input');
+    let userAnswer
+    let answer;
+    let VideoId;
+    let gotItPromise = null;
+    let problemCreationTime;
+    let accumulatedLogData = 'MathProblem,Input Answer,Correct Answer,Is correct marker,Reply Time in seconds\n';  // Variable to accumulate log data before saving it to the computer or server
+
+    let NUM_STEPS = 10;  // Adjust as needed
+    let currentLevel = NUM_STEPS - 1;
+    let probability1 = 0.5; // Replace with the actual probability
+
+
+    const correct_gifs = [
+        'https://media.tenor.com/uFV671ovOhgAAAAC/spongebob-many.gif',
+        'https://media.tenor.com/sOwqQjN8XPgAAAAC/spongebob-squarepants-toons.gif',
+        'https://media.tenor.com/vLih9-ji-twAAAAC/spongebob-spongebob-squarepants.gif',
+        'https://media.tenor.com/O3FkWgScIUMAAAAC/sponge-bob-thumbs-up.gif',
+        'https://media.tenor.com/SSigufTXwhsAAAAC/spongebob-thumbs-up.gif',
+        'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdnJ6dGt1eWdoa3lwczJ0emEweTNuMTJpamRxYTZiZm5oamt4ZWZnZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/xUPJPtV0h7zNuHujJe/giphy.gif',
+        'https://media.giphy.com/media/l1Etpcz0T4GJoeb7O/giphy.gif',
+
+        // Add more GIF URLs to this array as needed
+    ];
+
+    const incorrect_gifs = [
+        'https://media.giphy.com/media/xTeV7FKRuo5YX714L6/giphy.gif',
+        'https://media.giphy.com/media/3oxOCwwg0LvrKe5LoY/giphy.gif',
+        'https://media.giphy.com/media/xT3i1jNFxlIPJSq4Ks/giphy.gif',
+        'https://media.giphy.com/media/3oKHWzL4ymqnsXl6j6/giphy.gif',
+        'https://gifdb.com/images/high/university-come-back-spongebob-3588l8jxklmb3pse.gif',
+        // Add more GIF URLs to this array as needed
+    ];
+
+    const correctSounds = [
+        'https://soundboardguy.com/wp-content/uploads/2022/03/applause-1-mp3cut.mp3',
+        'https://soundboardguy.com/wp-content/uploads/2022/03/crowd-applause.mp3',
+        'https://soundboardguy.com/wp-content/uploads/2022/03/applause-1-mp3cut.mp3',
+        'https://soundboardguy.com/wp-content/uploads/2021/07/vv-applause-football.mp3',
+        // Add more correct sound URLs as needed
+    ];
+
+    const incorrectSounds = [
+        'https://us-tuna-sounds-files.voicemod.net/39850ac2-13db-4d70-a2a7-15373c9110ce-1653856084837.mp3',
+        'https://us-tuna-sounds-files.voicemod.net/c07b417a-be6b-43ca-ad5f-1eab0496dc5b-1691582530984.mp3',
+        'https://us-tuna-sounds-files.voicemod.net/55ecda2b-5754-4e58-81e5-e3470b3b2a00-1678130080051.mp3',
+        'https://us-tuna-sounds-files.voicemod.net/bfaaeea1-93d2-462f-be11-4316b475fbaf.mp3'
+        // Add more incorrect sound URLs as needed
+    ];
+
+    const thankYouGIF = [
+        'https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExeWpmbG40bjh5ZHZyZWpodnk4bTFxZmo5OGM5ZWlwcWZiZGRtdnNsbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6tHy8UAbv3zgs/giphy.gif',
+        'https://media.giphy.com/media/3ofSBxTeZ8OpzTkZGM/giphy.gif',
+    ];
+
+    function updateNumSteps() {
+        const numStepsInput = document.getElementById('numSteps');
+        NUM_STEPS = parseInt(numStepsInput.value, 10);
+        currentLevel = parseInt(NUM_STEPS - 1)
+        updateLadder()
+    }
+
+    function equationWithVariables() {
+        const enableFeatureCheckbox = document.getElementById('enableFeature');
+        probability1 = enableFeatureCheckbox.checked ? 0.5 : 0;  // Update probability1 based on checkbox state
+        document.getElementById('enableFeature').addEventListener('change', equationWithVariables);
+    }
+
+    function toggleMenu() {
+        const menu = document.getElementById('menu');
+        menu.style.display = (menu.style.display === 'block' || menu.style.display === '') ? 'none' : 'block';
+    }
+
+    function handleKeyPress(event) {
+      if (event.keyCode === 13) {
+        checkAnswer();
+      }
+    }
+
+    function createAdditionOrSubtractionProblem() {
+        const operator = Math.random() < 0.5 ? '+' : '-';
+        let num1, num2;
+
+        if (operator === '+') {
+            num1 = Math.floor(Math.random() * (21 -2) +2);
+            num2 = Math.floor(Math.random() * (21 - num1));
+            answer = Math.min(num1 + num2, 20);
+        } else { // operator is '-'
+            num1 = Math.floor(Math.random() * 21 -2 ) + 2;
+            num2 = Math.floor(Math.random() * (num1 + 1));
+            answer = Math.min(num1 - num2, 20);
+        }
+
+        const problemText = `${num1} ${operator} ${num2} = ?`;
+
+        // Display the problem with num1, operand, num2, and the equation
+        document.getElementById('problem-label').textContent = problemText;
+
+        // Store num1 and num2 in data attributes for future reference
+        document.getElementById('problem-label').setAttribute('data-num1', num1);
+        document.getElementById('problem-label').setAttribute('data-num2', num2);
+
+        console.log("Num1: " + num1 + ", Num2: " + num2 + ", Operator: " + operator + ", Answer: " + answer);
+    }
+
+    function createMissingNumberProblem() {
+        const operator = Math.random() < 0.5 ? '+' : '-';
+        let num1, num2, numTemp;
+
+        if (operator === '+') {
+            const hide_num1 = Math.random() < 0.5; // Returns true or false with roughly a 50% chance for each
+            if (hide_num1) {
+                answer = Math.floor(Math.random() * (21 - 2) + 2);
+                num1 = Math.floor(Math.random() * (20 - answer - 1) + 1) ;
+                num2 = Math.floor(answer + num1);
+                problemText = `? ${operator} ${num1} = ${num2}`;
+            }
+            else {
+                answer = Math.floor(Math.random() * (21 - 3) + 3);
+                num1 = Math.floor(Math.random() * (20 - answer - 1)) + 1;
+                num2 = Math.floor(num1 + answer,21);
+                problemText = `${num1} ${operator} ? = ${num2}`;
+            }
+        }
+
+        else { // operator is '-'
+            const hide_num1 = Math.random() < 0.5; // Returns true or false with roughly a 50% chance for each
+            if (hide_num1) { // when num1 is missing
+                answer = Math.floor(Math.random() * (21 - 10) + 10);
+                numTemp = Math.floor(Math.random() * (10 - 1) + 1);
+                num1 = Math.min(answer, numTemp);
+                num2 = Math.floor(answer - num1);
+                problemText = `? ${operator} ${num1} = ${num2}`;
+            }
+            else { // when num2 is missing
+                num1 = Math.floor(Math.random() * (21 - 2) + 2); // Ensure num1 will not be between 5-19.
+                numTemp = Math.floor(Math.random() * 15);
+                answer = Math.min(num1, numTemp);
+                num2 = (num1 - answer);
+                problemText = `${num1} ${operator} ? = ${num2}`;
+            }
+        }
+
+        console.log("Num1: " + num1 + ", Num2: " + num2 + ", Operator: " + operator + ", Answer: " + answer);
+
+        // Display the problem
+        document.getElementById('problem-label').textContent = problemText;
+    }
+
+    function createProblem() {
+        // Add the event listener for the checkbox that enables and disables the equation With Variables outside the equation With Variables function
+        document.getElementById('enableFeature').addEventListener('change', equationWithVariables);
+
+        // Call equationWithVariables initially to set the correct probability based on the checkbox state
+        equationWithVariables();
+
+        problemCreationTime = new Date();
+
+        if (currentLevel < 0) {
+            return;
+        }else if (Math.random() < probability1) {
+            createMissingNumberProblem();
+        } else {
+            createAdditionOrSubtractionProblem();
+        }
+    }
+
+    function updateProblemAfterMistake() {
+        const correctAnswerDiv = document.getElementById('correct-answer');
+        correctAnswerDiv.style.display = 'none';  // hide the correct answer
+        const submitButton = document.getElementById('submit-button');
+        submitButton.style.display = 'block';
+        const gotItButton = document.getElementById('got-it-button');
+        gotItButton.style.display = 'none';
+        document.getElementById('answer-input').value = '';
+
+        createProblem()
+
+    }
+
+    function updateLadder() {
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const stepSize = canvas.height / NUM_STEPS;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < NUM_STEPS; i++) {
+            let color;
+            if (i > currentLevel) {
+                color = 'green';
+            } else if (i === currentLevel) {
+                color = 'blue';
+            } else {
+                color = 'gray';
+            }
+            ctx.fillStyle = color;
+            ctx.fillRect(0, i * stepSize, canvas.width, (i + 1) * stepSize);
+
+            }
+    }
+
+    function checkAnswer() {
+        const userAnswerElement = document.getElementById('answer-input');
+        const userAnswer = userAnswerElement.value.trim();
+        if (userAnswer === '') {
+            alert('Please enter an answer.');  // Inform the user to provide an answer
+            return;
+            }
+
+        if (parseInt(userAnswer) === answer) {
+            currentLevel--; // Update the current level as needed
+            logRunDetails(parseInt(userAnswer))
+            updateLadder(currentLevel)
+
+            // Create a new problem
+            createProblem(probability1);
+            document.getElementById('answer-input').value = '';  // Clear the answer input
+
+            // Show correct animation or message
+            showCorrectGif();
+
+            if (currentLevel < 0) {
+                document.getElementById('problem-label').style.display = 'none'; // hide the problem label
+                document.getElementById('answer-input').style.display = 'none'; // hide answer inpur box
+                document.getElementById('submit-button').style.display = 'none';  // hide the submit button
+
+                document.getElementById('play-again-button').style.display = 'block'; // show the thank you notice
+                document.getElementById('video-options').style.display = 'block'; // Show the video button
+                document.getElementById('download-button').style.display = 'block'; // Show the log download button
+                document.getElementById('thank-you').style.display = 'block'; // show the thank you gif
+            }
+
+        } else {
+            logRunDetails(parseInt(userAnswer))
+            if (currentLevel < NUM_STEPS - 1) {
+                currentLevel++;
+                updateLadder(currentLevel)
+            }
+            // Show incorrect animation or message
+            showIncorrectGif();
+
+            // Display correct answer
+            const correctAnswerDiv = document.getElementById('correct-answer');
+            correctAnswerDiv.innerHTML = '<strong>The correct answer is: <br><span style="font-size: 70px; color: blue;">' + answer + '</span></strong>';
+            correctAnswerDiv.style.display = 'block';  // Show the correct answer
+            const submitButton = document.getElementById('submit-button');
+            submitButton.style.display = 'none';
+            const gotItButton = document.getElementById('got-it-button');
+            gotItButton.style.display = 'block';
+        }
+    }
+
+    function restartLadder() {
+        currentLevel = NUM_STEPS - 1; // Reset the current level to the bottom
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const stepSize = canvas.height / NUM_STEPS;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let i = 0; i < NUM_STEPS; i++) {
+            let color;
+            if (i > currentLevel) {
+                color = 'gray';
+            } else if (i === currentLevel) {
+                color = 'blue';
+            } else {
+                color = 'green';
+            }
+            ctx.fillStyle = color;
+            ctx.fillRect(0, i * stepSize, canvas.width, (i + 1) * stepSize);
+        }
+        debugger;
+
+        // Create a new problem
+        createProblem(probability1);
+        document.getElementById('answer-input').value = '';  // Clear the answer input
+    }
+
+    function showIncorrectGif() {
+        // Play a random incorrect sound
+        playRandomSound(incorrectSounds);
+
+        // place the gif on top of the screen
+        const body = document.body;
+        const incorrectGif = document.createElement('img');
+
+        // Choose a random incorrect GIF from the array
+        const randomGifUrl = incorrect_gifs[Math.floor(Math.random() * incorrect_gifs.length)];
+
+        incorrectGif.src = randomGifUrl;
+        incorrectGif.classList.add('incorrect-gif');
+
+        // Append the GIF to the body
+        body.appendChild(incorrectGif);
+
+        // Center the GIF in the lower section
+        incorrectGif.style.position = 'fixed';
+        incorrectGif.style.top = '0';
+        incorrectGif.style.left = '50%';
+        incorrectGif.style.transform = 'translateX(-50%)';
+
+        // Set a timeout to hide the GIF after 3 seconds
+        setTimeout(() => {
+            incorrectGif.style.display = 'none';
+        }, 3000);
+
+    }
+
+    function showCorrectGif() {
+       // Play a random correct sound
+        playRandomSound(correctSounds);
+        if (currentLevel >= 0) {
+            const body = document.body;
+            const correctGif = document.createElement('img');
+
+            // Choose a random GIF from the array
+            const randomGifUrl = correct_gifs[Math.floor(Math.random() * correct_gifs.length)];
+
+            correctGif.src = randomGifUrl;
+            correctGif.classList.add('correct-gif');
+
+            // Append the GIF to the body
+            body.appendChild(correctGif);
+
+            // Center the GIF in the lower section
+            correctGif.style.position = 'fixed';
+            correctGif.style.top = '0';
+            correctGif.style.left = '50%';
+            correctGif.style.transform = 'translateX(-50%)';
+
+            // Set a timeout to hide the GIF after 3 seconds
+            setTimeout(() => {
+                correctGif.style.display = 'none';
+            }, 3000);
+
+        }
+    }
+
+    function playRandomSound(soundsArray) {
+        const randomSoundUrl = soundsArray[Math.floor(Math.random() * soundsArray.length)];
+        const audio = new Audio(randomSoundUrl);
+        audio.play();
+    }
+
+
+
+
+    function chooseVideo(videoId) {
+
+        const videoContainer = document.getElementById('video-options');
+        videoContainer.innerHTML = `
+        <iframe width="560" height="315" src="${videoId}" frameborder="0" allowfullscreen></iframe>
+        `;
+    }
+
+
+
+
+
+// this will create the log:
+
+    function logRunDetails(userAnswer) {
+        const mathProblem = document.getElementById('problem-label').textContent;
+        const correctAnswer = answer;
+        const isCorrect = userAnswer === correctAnswer ? 'Correct' : 'Wrong';
+        const timeTaken = (new Date() - problemCreationTime) / 1000; // Add logic to calculate time taken
+
+        // Format data as a CSV string
+        const logData = `${mathProblem},${userAnswer},${correctAnswer},${isCorrect},${timeTaken}\n`;
+        accumulatedLogData += logData;
+    }
+
+//this will save the log to CSV and allow the user to download it manually
+// i need to find a way to download it aoutomaticlly or save it to email or google cloud
+// Needs to be update for saving the log. I will save it in my computer first, and than allow a save to the google cloud, I have converesed with GPT on it on Oct 3.
+
+    function downloadCSV() {
+        const logData = accumulatedLogData; // Assume you have a function to generate the log data
+        const blob = new Blob([logData], { type: 'text/csv' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'log_data.csv';
+        link.click();
+    }
+
+    //needs to be update with all static data, need to decide how to call this, this will be used to collect user data such as IP, email, etc
+    function logGeneralDetails() {
+        const timeStart = new Date().toLocaleString();
+        const logData = `${timeStart},${UserEmail},${amountOfSteps},${musicPlayed}\n`;
+    }
+
+    // Initialize the game
+    createProblem();
+    updateLadder();
+
+    function playAgain(){
+    currentLevel = NUM_STEPS - 1;
+    document.getElementById('problem-label').style.display = 'block'; // hide the problem label
+    document.getElementById('answer-input').style.display = 'block'; // hide answer inpur box
+    document.getElementById('submit-button').style.display = 'block';  // hide the submit button
+    document.getElementById('play-again-button').style.display = 'none'; // show the thank you notice
+    document.getElementById('video-options').style.display = 'none'; // Show the video button
+    document.getElementById('download-button').style.display = 'none'; // Show the log download button
+    document.getElementById('thank-you').style.display = 'none'; // show the thank you gif
+    createProblem();
+    updateLadder();
+    }
+
+// To DO:
+// create a landing page where you can select the type of problems you want to solve
+// add num1 > < = num 2
+//collect user static data such as IP address and email (in function logGeneralDetails() {)
+//Needs to be update for saving the log. I will save it in my computer first, and than allow a save to the google cloud, I have converesed with GPT on it on Oct 3. (637)
+
+
+</script>
+
+</body>
+</html>
+
+
