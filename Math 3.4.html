@@ -128,8 +128,6 @@ body {
 }
 
 .navbar {
-    background-color: #333;
-    color: white;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -137,7 +135,7 @@ body {
 }
 
 .burger-icon {
-    display: none;
+    display: flex;
     flex-direction: column;
     cursor: pointer;
 }
@@ -145,25 +143,34 @@ body {
 .burger-icon .bar {
     height: 3px;
     width: 25px;
-    background-color: white;
+    background-color: black;
     margin: 3px 0;
 }
 
-.menu {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+#menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px; /* Adjust the width as needed */
+    height: 100%;
+    background-color: #111;
+    overflow-x: hidden;
+    transition: 0.5s;
+    padding-top: 60px;
 }
 
-.menu a {
-    color: white;
-    padding: 14px 16px;
+#menu a {
+    padding: 8px 8px 8px 16px;
     text-decoration: none;
+    font-size: 25px;
+    color: white;
+    display: block;
+    transition: 0.3s;
 }
 
-.menu a:hover {
-    background-color: #ddd;
-    color: black;
+#menu a:hover {
+    color: orange;
 }
 
 .num-steps-input {
@@ -193,21 +200,18 @@ body {
     </script>
 
         <div class="navbar">
-        <div class="burger-icon" onclick="toggleMenu()">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-        </div>
+            <div class="burger-icon" onclick="toggleMenu()">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
         <div class="menu" id="menu">
-            <a href="#">Home</a>
+            <a href="#">Enable equation with variables</label><br>  
+            <input type="checkbox" style="width: 40px; height: 40px;" id="enableFeature" checked>
+            <a href="#">Number of Steps:</label>
+            <input type="number" style="width: 100px; height: 40px; font-size: 30px;" id="numSteps" value="10" class="num-steps-input", min="1", onchange="updateNumSteps()">
             <a href="#">About</a>
             <a href="#">Contact</a>
-            <label for="enableFeature">Enable equation with variables</label>
-           <input type="checkbox" id="enableFeature" checked>
-           <br>
-            <br>
-           <label for="numSteps">Number of Steps:</label>
-           <input type="number" id="numSteps" value="10" class="num-steps-input", min="1", onchange="updateNumSteps()">
         </div>
     </div>
 
@@ -225,12 +229,12 @@ body {
                 <!-- Button for submitting the answer -->
                 <button id="submit-button" onclick="checkAnswer()">Submit</button>
                 <!-- Button for playing again -->
-                <button id="play-again-button" onclick="playAgain()" style="display: none;">Press here to play again</button>
+                <button id="play-again-button" onclick="playAgain()" style="display: none;">Press here to play again</button>     
                 <div id="correct-answer" style="display: none;"></div>
                 <button id="got-it-button" onclick="updateProblemAfterMistake(probability1)" style="display: none;">Got It</button>
                 <div id="thank-you" style="display: none;" >Thanks for playing</div>
                 <!-- Button for downloading log data -->
-                <button id="download-button" onclick="downloadCSV()" style="display: none;">Press here to download your results summary</button>
+                <button id="download-button" onclick="downloadCSV()" style="display: none;">Press here to download your results summary</button>            
             </div>
         </div>
     </div>
@@ -324,12 +328,30 @@ body {
         menu.style.display = (menu.style.display === 'block' || menu.style.display === '') ? 'none' : 'block';
     }
 
+    // Close the menu when clicking outside of it
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('menu');
+        const burgerIcon = document.querySelector('.burger-icon');
+        if (event.target !== menu && !menu.contains(event.target)) {
+            menu.style.display = 'none';
+        }
+        if (event.target === burgerIcon) {
+        toggleMenu();
+    }
+});
+
+    const burgerIcon = document.querySelector('.burger-icon');
+    burgerIcon.addEventListener('click', function(event) {
+        toggleMenu();
+    });
+
+
     function handleKeyPress(event) {
       if (event.keyCode === 13) {
         checkAnswer();
       }
     }
-
+    
     function createAdditionOrSubtractionProblem() {
         const operator = Math.random() < 0.5 ? '+' : '-';
         let num1, num2;
@@ -477,7 +499,7 @@ body {
                 document.getElementById('problem-label').style.display = 'none'; // hide the problem label
                 document.getElementById('answer-input').style.display = 'none'; // hide answer inpur box
                 document.getElementById('submit-button').style.display = 'none';  // hide the submit button
-
+                
                 document.getElementById('play-again-button').style.display = 'block'; // show the thank you notice
                 document.getElementById('video-options').style.display = 'block'; // Show the video button
                 document.getElementById('download-button').style.display = 'block'; // Show the log download button
@@ -623,7 +645,7 @@ body {
 
         // Format data as a CSV string
         const logData = `${mathProblem},${userAnswer},${correctAnswer},${isCorrect},${timeTaken}\n`;
-        accumulatedLogData += logData;
+        accumulatedLogData += logData;  
     }
 
 //this will save the log to CSV and allow the user to download it manually
@@ -648,7 +670,7 @@ body {
     // Initialize the game
     createProblem();
     updateLadder();
-
+    
     function playAgain(){
     currentLevel = NUM_STEPS - 1;
     document.getElementById('problem-label').style.display = 'block'; // hide the problem label
@@ -661,7 +683,7 @@ body {
     createProblem();
     updateLadder();
     }
-
+    
 // To DO:
 // create a landing page where you can select the type of problems you want to solve
 // add num1 > < = num 2
