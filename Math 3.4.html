@@ -459,6 +459,14 @@ compare-problem{
     }
     
     function createAdditionOrSubtractionProblem() {
+        document.getElementById('problem-label').style.display = 'block'; // hide the problem label
+        document.getElementById('answer-input').style.display = 'block'; // hide answer inpur box
+        document.getElementById('submit-button').style.display = 'block';  // hide the submit button
+        document.getElementById('num1').style.display = 'none'; // show Bigger sign
+        document.getElementById('num2').style.display = 'none'; // show Bigger sign
+        document.getElementById('bigger-button').style.display = 'none'; // show Bigger sign
+        document.getElementById('equal-button').style.display = 'none'; // show Equal sign
+        document.getElementById('smaller-button').style.display = 'none'; // show Smaller sign
         const operator = Math.random() < 0.5 ? '+' : '-';
         let num1, num2;
 
@@ -482,6 +490,15 @@ compare-problem{
     }
 
     function createMissingNumberProblem() {
+        document.getElementById('problem-label').style.display = 'block'; // hide the problem label
+        document.getElementById('answer-input').style.display = 'block'; // hide answer inpur box
+        document.getElementById('submit-button').style.display = 'block';  // hide the submit button
+        document.getElementById('num1').style.display = 'none'; // show Bigger sign
+        document.getElementById('num2').style.display = 'none'; // show Bigger sign
+        document.getElementById('bigger-button').style.display = 'none'; // show Bigger sign
+        document.getElementById('equal-button').style.display = 'none'; // show Equal sign
+        document.getElementById('smaller-button').style.display = 'none'; // show Smaller sign
+
         const operator = Math.random() < 0.5 ? '+' : '-';
         let num1, num2, numTemp;
 
@@ -675,7 +692,7 @@ compare-problem{
             }
 
         } else {
-            logRunDetails(parseInt(userAnswer))
+            logRunDetails(parseInt(userAnswer,mathProblem))
             if (currentLevel < NUM_STEPS - 1) {
                 currentLevel++;
                 updateLadder(currentLevel)
