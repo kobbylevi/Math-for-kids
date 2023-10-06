@@ -37,6 +37,52 @@ body {
     text-align: center;
 }
 
+
+compare-problem{
+    width: 10%; /* Adjust the width as needed, e.g., 80% of the container width */
+}    
+
+
+.bigger-button button{
+    cursor: pointer;
+    font-size: 30px;
+    padding: 10px;
+    margin-bottom: 10px; /* Adjust the spacing between buttons */
+    width: 40%; /* Adjust the width as needed, e.g., 80% of the container width */
+    margin-left: auto; /* Center the element by pushing it to the right */
+    margin-right: auto; /* Center the element by pushing it to the left */
+}
+
+.compare-numbers{
+    display: flex;
+}
+
+#num1, #num2{
+    font-size: 40px;
+    margin-left: auto; /* Center the element by pushing it to the right */
+    margin-right: auto; /* Center the element by pushing it to the left */
+}
+
+.compare-numbers button{
+    cursor: pointer;
+    font-size: 30px;
+    padding: 10px;
+    margin-bottom: 10px; /* Adjust the spacing between buttons */
+    width: 40%; /* Adjust the width as needed, e.g., 80% of the container width */
+    margin-left: auto; /* Center the element by pushing it to the right */
+    margin-right: auto; /* Center the element by pushing it to the left */
+}
+
+.smaller-button button{
+    cursor: pointer;
+    font-size: 30px;
+    padding: 10px;
+    margin-bottom: 5px; /* Adjust the spacing between buttons */
+    width: 40%; /* Adjust the width as needed, e.g., 80% of the container width */
+    margin-left: auto; /* Center the element by pushing it to the right */
+    margin-right: auto; /* Center the element by pushing it to the left */
+}
+
 .lower {
     flex: 1;
     padding: 10px;
@@ -187,6 +233,7 @@ body {
      display: none;
 }
 
+
 </style>
 
 </head>
@@ -206,9 +253,13 @@ body {
                 <div class="bar"></div>
             </div>
         <div class="menu" id="menu">
+            <a href="#">Enable Addition Subtruction</label><br>  
+            <input type="checkbox" style="width: 40px; height: 40px;" id="addSubCheckBox" checked>
             <a href="#">Enable equation with variables</label><br>  
-            <input type="checkbox" style="width: 40px; height: 40px;" id="enableFeature" checked>
-            <a href="#">Number of Steps:</label>
+            <input type="checkbox" style="width: 40px; height: 40px;" id="VarCheckBox" unchecked>
+            <a href="#">Enable comparing numbers</label><br>  
+            <input type="checkbox" style="width: 40px; height: 40px;" id="CompareCheckBox" unchecked>
+            <a href="#">Number of questions:</label>
             <input type="number" style="width: 100px; height: 40px; font-size: 30px;" id="numSteps" value="10" class="num-steps-input", min="1", onchange="updateNumSteps()">
             <a href="#">About</a>
             <a href="#">Contact</a>
@@ -228,10 +279,26 @@ body {
                 <input type="number" id="answer-input" placeholder="Enter answer" autofocus onkeyup="handleKeyPress(event)">
                 <!-- Button for submitting the answer -->
                 <button id="submit-button" onclick="checkAnswer()">Submit</button>
+
+                <!-- Section for bigger smaller problems -->
+                <div class="compare-problem">
+                    <div class="bigger-button">
+                        <button id="bigger-button" style="display: none;" onclick="selectComparison('>')">></button>
+                    </div>
+                    <div class="compare-numbers">
+                        <span id="num1" style="display: none;"></span>
+                        <button id="equal-button" style="display: none;" onclick="selectComparison('=')">=</button>
+                        <span id="num2" style="display: none;"></span>
+                    </div>
+                    <div class="smaller-button">
+                        <button id="smaller-button" style="display: none;" onclick="selectComparison('<')"><</button>
+                    </div>
+                </div>
+
                 <!-- Button for playing again -->
                 <button id="play-again-button" onclick="playAgain()" style="display: none;">Press here to play again</button>     
                 <div id="correct-answer" style="display: none;"></div>
-                <button id="got-it-button" onclick="updateProblemAfterMistake(probability1)" style="display: none;">Got It</button>
+                <button id="got-it-button" onclick="updateProblemAfterMistake(probabilityforVar)" style="display: none;">Got It</button>
                 <div id="thank-you" style="display: none;" >Thanks for playing</div>
                 <!-- Button for downloading log data -->
                 <button id="download-button" onclick="downloadCSV()" style="display: none;">Press here to download your results summary</button>            
@@ -265,8 +332,47 @@ body {
 
     let NUM_STEPS = 10;  // Adjust as needed
     let currentLevel = NUM_STEPS - 1;
-    let probability1 = 0.5; // Replace with the actual probability
 
+    let probabilityforAddition = 1
+    let probabilityforVar = 0;
+    let probabilityforCompare = 0;
+
+    //Listeners:
+
+    // Close the menu when clicking outside of it
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('menu');
+        const burgerIcon = document.querySelector('.burger-icon');
+        if (event.target !== menu && !menu.contains(event.target)) {
+            menu.style.display = 'none';
+        }
+        if (event.target === burgerIcon) {
+            toggleMenu();
+        }
+    });
+
+    // Open the menu when clicking On the hamburger
+    const burgerIcon = document.querySelector('.burger-icon');
+    burgerIcon.addEventListener('click', function(event) {
+        toggleMenu();
+    });
+
+    // check for changes in the addition subtrutcion tickbox
+    const addSubCheckBox = document.getElementById('addSubCheckBox');
+    addSubCheckBox.addEventListener('change', updateProbabilities);
+    
+
+    // check for changes in the equations with variables tickbox
+    const VarCheckBox = document.getElementById('VarCheckBox');
+    VarCheckBox.addEventListener('change', updateProbabilities);
+
+    
+    // check for changes in the compare problems tickbox
+    const CompareCheckBox = document.getElementById('CompareCheckBox');
+    CompareCheckBox.addEventListener('change', updateProbabilities);
+
+
+    //Lists of media files:
 
     const correct_gifs = [
         'https://media.tenor.com/uFV671ovOhgAAAAC/spongebob-many.gif',
@@ -310,6 +416,30 @@ body {
         'https://media.giphy.com/media/3ofSBxTeZ8OpzTkZGM/giphy.gif',
     ];
 
+    //Functions:
+
+    // updated the probability for each question type based on the user selction for tick boxes
+    function updateProbabilities() {
+        const totalSelectedOptions = [addSubCheckBox, VarCheckBox, CompareCheckBox].filter(checkbox => checkbox.checked).length;
+        if (totalSelectedOptions === 0) {
+            alert('Please Select at list one question type.');  // Inform the user to provide an answer
+            return;
+        }
+        else{     // Update probabilities based on selected options
+            const A = document.getElementById('addSubCheckBox').checked ? 1 : 0;
+            const V = document.getElementById('VarCheckBox').checked ? 1 : 0;
+            const C = document.getElementById('CompareCheckBox').checked ? 1 : 0;
+            console.log ("Addition is: " + A + ", Variables is: " + V + ", Compare is: " + C)
+            probabilityforAddition = A/totalSelectedOptions;
+            probabilityforVar = V/totalSelectedOptions;
+            probabilityforCompare = C/totalSelectedOptions;
+            console.log('totalSelectedOptions is:' + totalSelectedOptions);
+        
+        createProblem()
+        console.log('probabilities for Addition is: "' + probabilityforAddition + ', variables is: ' + probabilityforVar + ', copmare is: ' + probabilityforCompare);
+        }
+    }
+
     function updateNumSteps() {
         const numStepsInput = document.getElementById('numSteps');
         NUM_STEPS = parseInt(numStepsInput.value, 10);
@@ -317,35 +447,11 @@ body {
         updateLadder()
     }
 
-    function equationWithVariables() {
-        const enableFeatureCheckbox = document.getElementById('enableFeature');
-        probability1 = enableFeatureCheckbox.checked ? 0.5 : 0;  // Update probability1 based on checkbox state
-        document.getElementById('enableFeature').addEventListener('change', equationWithVariables);
-    }
-
     function toggleMenu() {
         const menu = document.getElementById('menu');
         menu.style.display = (menu.style.display === 'block' || menu.style.display === '') ? 'none' : 'block';
     }
-
-    // Close the menu when clicking outside of it
-    document.addEventListener('click', function(event) {
-        const menu = document.getElementById('menu');
-        const burgerIcon = document.querySelector('.burger-icon');
-        if (event.target !== menu && !menu.contains(event.target)) {
-            menu.style.display = 'none';
-        }
-        if (event.target === burgerIcon) {
-        toggleMenu();
-    }
-});
-
-    const burgerIcon = document.querySelector('.burger-icon');
-    burgerIcon.addEventListener('click', function(event) {
-        toggleMenu();
-    });
-
-
+// Allow the user to press enter instead of Submit when inputing answer
     function handleKeyPress(event) {
       if (event.keyCode === 13) {
         checkAnswer();
@@ -371,9 +477,6 @@ body {
         // Display the problem with num1, operand, num2, and the equation
         document.getElementById('problem-label').textContent = problemText;
 
-        // Store num1 and num2 in data attributes for future reference
-        document.getElementById('problem-label').setAttribute('data-num1', num1);
-        document.getElementById('problem-label').setAttribute('data-num2', num2);
 
         console.log("Num1: " + num1 + ", Num2: " + num2 + ", Operator: " + operator + ", Answer: " + answer);
     }
@@ -422,35 +525,60 @@ body {
         document.getElementById('problem-label').textContent = problemText;
     }
 
+
+    // need to update this function:
+    function createCompareProblem() {
+        document.getElementById('problem-label').style.display = 'none'; // hide the problem label
+        document.getElementById('answer-input').style.display = 'none'; // hide answer inpur box
+        document.getElementById('submit-button').style.display = 'none';  // hide the submit button
+        document.getElementById('num1').style.display = 'block'; // show Bigger sign
+        document.getElementById('num2').style.display = 'block'; // show Bigger sign
+        document.getElementById('bigger-button').style.display = 'block'; // show Bigger sign
+        document.getElementById('equal-button').style.display = 'block'; // show Equal sign
+        document.getElementById('smaller-button').style.display = 'block'; // show Smaller sign
+        
+        num1 =  Math.floor(Math.random() * 100) + 1;
+        num2 =  Math.floor(Math.random() * 100) + 1;
+        document.getElementById('num1').innerText = num1
+        document.getElementById('num2').innerText = num2;
+        
+        if (num1 < num2){
+            answer = "<";
+        }
+        else if (num1 > num2){
+            answer = ">";
+        }
+        else if (num1 = num2){
+            answer = "=";
+        }
+        // add logging for the problem
+    }
+
     function createProblem() {
-        // Add the event listener for the checkbox that enables and disables the equation With Variables outside the equation With Variables function
-        document.getElementById('enableFeature').addEventListener('change', equationWithVariables);
-
-        // Call equationWithVariables initially to set the correct probability based on the checkbox state
-        equationWithVariables();
-
+        console.log("creating problem")
         problemCreationTime = new Date();
-
-        if (currentLevel < 0) {
-            return;
-        }else if (Math.random() < probability1) {
-            createMissingNumberProblem();
-        } else {
+        let A, V, C;
+        A = Math.random() * probabilityforAddition;
+        V = Math.random() * probabilityforVar;
+        C = Math.random() * probabilityforCompare;
+        if (Math.max(A,V,C) === A){
             createAdditionOrSubtractionProblem();
+            console.log('Addition') ;
+        } else if (Math.max(A,V,C) === V){
+            createMissingNumberProblem();
+            console.log('Variable');
+        } else if (Math.max(A,V,C) === C){
+            createCompareProblem();
+            console.log('compare');
         }
     }
 
     function updateProblemAfterMistake() {
-        const correctAnswerDiv = document.getElementById('correct-answer');
-        correctAnswerDiv.style.display = 'none';  // hide the correct answer
-        const submitButton = document.getElementById('submit-button');
-        submitButton.style.display = 'block';
-        const gotItButton = document.getElementById('got-it-button');
-        gotItButton.style.display = 'none';
+        document.getElementById('correct-answer').style.display = 'none';  // hide the correct answer
+        document.getElementById('submit-button').style.display = 'block';
+        document.getElementById('got-it-button').style.display = 'none';
         document.getElementById('answer-input').value = '';
-
         createProblem()
-
     }
 
     function updateLadder() {
@@ -475,7 +603,47 @@ body {
             }
     }
 
+    function selectComparison(userAnswer){
+        const mathProblem = document.getElementById('num1').textContent + " ? " + document.getElementById('num2').textContent
+        console.log(userAnswer)
+        console.log(answer)
+        if (userAnswer === answer) {
+            currentLevel--; // Update the current level as needed
+            logRunDetails(userAnswer,mathProblem)
+            updateLadder(currentLevel)
+
+            // Create a new problem
+            createProblem(probabilityforVar);
+            document.getElementById('answer-input').value = '';  // Clear the answer input
+
+            // Show correct animation or message
+            showCorrectGif();
+
+            if (currentLevel < 0) {
+                document.getElementById('num1').style.display = 'none'; // hide Bigger sign
+                document.getElementById('num2').style.display = 'none'; // hide Bigger sign
+                document.getElementById('bigger-button').style.display = 'none'; // hide Bigger sign
+                document.getElementById('equal-button').style.display = 'none'; // hide Equal sign
+                document.getElementById('smaller-button').style.display = 'none'; // hide Smaller sign
+                document.getElementById('play-again-button').style.display = 'block'; // show the thank you notice
+                document.getElementById('video-options').style.display = 'block'; // Show the video button
+                document.getElementById('download-button').style.display = 'block'; // Show the log download button
+                document.getElementById('thank-you').style.display = 'block'; // show the thank you gif
+            }
+
+        } else {
+            logRunDetails(parseInt(userAnswer),mathProblem)
+            if (currentLevel < NUM_STEPS - 1) {
+                currentLevel++;
+                updateLadder(currentLevel)
+            }
+            // Show incorrect animation or message
+            showIncorrectGif();
+        }
+    }
+
     function checkAnswer() {
+        const mathProblem = document.getElementById('problem-label').textContent;
         const userAnswerElement = document.getElementById('answer-input');
         const userAnswer = userAnswerElement.value.trim();
         if (userAnswer === '') {
@@ -485,11 +653,11 @@ body {
 
         if (parseInt(userAnswer) === answer) {
             currentLevel--; // Update the current level as needed
-            logRunDetails(parseInt(userAnswer))
+            logRunDetails(parseInt(userAnswer),mathProblem)
             updateLadder(currentLevel)
 
             // Create a new problem
-            createProblem(probability1);
+            createProblem(probabilityforVar);
             document.getElementById('answer-input').value = '';  // Clear the answer input
 
             // Show correct animation or message
@@ -550,7 +718,7 @@ body {
         debugger;
 
         // Create a new problem
-        createProblem(probability1);
+        createProblem(probabilityforVar);
         document.getElementById('answer-input').value = '';  // Clear the answer input
     }
 
@@ -637,14 +805,14 @@ body {
 
 // this will create the log:
 
-    function logRunDetails(userAnswer) {
-        const mathProblem = document.getElementById('problem-label').textContent;
+    function logRunDetails(userAnswer, mathProblem) {
+
         const correctAnswer = answer;
         const isCorrect = userAnswer === correctAnswer ? 'Correct' : 'Wrong';
         const timeTaken = (new Date() - problemCreationTime) / 1000; // Add logic to calculate time taken
 
         // Format data as a CSV string
-        const logData = `${mathProblem},${userAnswer},${correctAnswer},${isCorrect},${timeTaken}\n`;
+        const logData = mathProblem + `,${userAnswer},${correctAnswer},${isCorrect},${timeTaken}\n`;
         accumulatedLogData += logData;  
     }
 
