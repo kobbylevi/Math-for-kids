@@ -353,8 +353,15 @@ compare-problem{
 
     // Open the menu when clicking On the hamburger
     const burgerIcon = document.querySelector('.burger-icon');
-    burgerIcon.addEventListener('click', function(event) {
-        toggleMenu();
+    burgerIcon.addEventListener('click', function(event) { 
+    console.log('Manu clicked')
+    toggleMenu();
+    });
+
+    // Open the menu when clicking On the hamburger
+    burgerIcon.addEventListener('touchstart', function(event) { 
+    console.log('touch Manu clicked')
+    toggleMenu();
     });
 
     // check for changes in the addition subtrutcion tickbox
@@ -448,6 +455,7 @@ compare-problem{
     }
 
     function toggleMenu() {
+        console.log('Toggle menu activated')
         const menu = document.getElementById('menu');
         menu.style.display = (menu.style.display === 'block' || menu.style.display === '') ? 'none' : 'block';
     }
