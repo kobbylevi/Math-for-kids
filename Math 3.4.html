@@ -672,7 +672,7 @@ compare-problem{
             }
 
         } else {
-            logRunDetails(parseInt(userAnswer),mathProblem)
+            logRunDetails(userAnswer,mathProblem)
             if (currentLevel < NUM_STEPS - 1) {
                 currentLevel++;
                 updateLadder(currentLevel)
@@ -693,7 +693,7 @@ compare-problem{
 
         if (parseInt(userAnswer) === answer) {
             currentLevel--; // Update the current level as needed
-            logRunDetails(parseInt(userAnswer),mathProblem)
+            logRunDetails(userAnswer,mathProblem)
             updateLadder(currentLevel)
 
             // Create a new problem
@@ -715,7 +715,7 @@ compare-problem{
             }
 
         } else {
-            logRunDetails(parseInt(userAnswer,mathProblem))
+            logRunDetails(userAnswer,mathProblem)
             if (currentLevel < NUM_STEPS - 1) {
                 currentLevel++;
                 updateLadder(currentLevel)
