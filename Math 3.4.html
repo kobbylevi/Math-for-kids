@@ -849,6 +849,7 @@ compare-problem{
 
         const correctAnswer = answer;
         const isCorrect = userAnswer === correctAnswer ? 'Correct' : 'Wrong';
+        console.log(isCorrect)
         const timeTaken = (new Date() - problemCreationTime) / 1000; // Add logic to calculate time taken
 
         // Format data as a CSV string
