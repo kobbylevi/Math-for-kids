@@ -848,7 +848,7 @@ compare-problem{
     function logRunDetails(userAnswer, mathProblem) {
 
         const correctAnswer = answer;
-        const isCorrect = userAnswer === correctAnswer ? 'Correct' : 'Wrong';
+        const isCorrect = parseInt(userAnswer) === correctAnswer ? 'Correct' : 'Wrong';
         console.log("User answer: " + userAnswer)
         console.log("Correct Answer: " + correctAnswer)
         console.log(isCorrect)
@@ -879,7 +879,7 @@ compare-problem{
     }
 
     // Initialize the game
-    console.log("version 2")
+    console.log("version 1")
     createProblem();
     updateLadder();
     
